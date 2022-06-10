@@ -26,6 +26,8 @@ function Home(){
             <button onClick={handleAlertClick}>
                 Show alert
             </button>
+
+            <div><h3>123</h3><p>456</p><span>789</span></div>
         </div>
     )
 }
