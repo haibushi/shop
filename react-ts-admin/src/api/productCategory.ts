@@ -1,37 +1,40 @@
 import axios from "../lib/axios";
 import type { AxiosPromise } from "axios";
-import React from "react";
-import { Service } from "./type";
+import type { Service } from "./type";
 
-interface AddLunboType {
-  photo: string;
-  link: string;
+interface AddDataType {
+  name: string;
   sort: number;
 }
 
-export function addLunbo(data: AddLunboType): AxiosPromise<Service<any>> {
-  // post
+export interface listType {
+  id: number;
+  name: string;
+  sort: number;
+  create_at: number;
+  create_time: string;
+}
+
+export function add(data: AddDataType): AxiosPromise<Service<string>> {
   return axios({
     method: "post",
-    url: "/lunbo/add",
+    url: "/productcategory/add",
     data,
   });
 }
 
-export function listLunbo(data: any = {}): AxiosPromise<Service<any>> {
-  // get
+export function list(data: any = {}): AxiosPromise<Service<listType[]>> {
   return axios({
     method: "get",
-    url: "/lunbo/index",
+    url: "/productcategory/index",
     params: data,
   });
 }
 
-export function deleteLunbo(data: { id: number }): AxiosPromise<Service<any>> {
-  // get
+export function del(data: { id: number }): AxiosPromise<Service<any>> {
   return axios({
     method: "get",
-    url: "/lunbo/del",
+    url: "/productcategory/del",
     params: data,
   });
 }
@@ -39,28 +42,26 @@ export function deleteLunbo(data: { id: number }): AxiosPromise<Service<any>> {
 export function find(data: { id: number }): AxiosPromise<Service<any>> {
   return axios({
     method: "get",
-    url: "/lunbo/find",
+    url: "/productcategory/find",
     params: data,
   });
 }
 
 export function update(
   id: number,
-  data: AddLunboType
+  data: AddDataType
 ): AxiosPromise<Service<any>> {
-  // post
   return axios({
     method: "post",
-    url: "/lunbo/update/?id=" + id,
+    url: "/productcategory/update/?id=" + id,
     data,
   });
 }
 
 export function deleteAll(data: { ids: string }): AxiosPromise<Service<any>> {
-  // post
   return axios({
     method: "post",
-    url: "/lunbo/deleteAll",
+    url: "/productcategory/deleteAll",
     params: data,
   });
 }

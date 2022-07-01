@@ -1,14 +1,14 @@
-import {configureStore} from '@reduxjs/toolkit';
-import userSlice from './userSlice';
+import { configureStore } from "@reduxjs/toolkit";
+import userSlice from "./userSlice";
 
-export interface StorelistType{
-    user:any
+export interface StorelistType {
+  user: any;
 }
 
 const Store = configureStore({
-    reducer:{
-        user: userSlice
-    }
-})
+  reducer: {
+    user: userSlice,
+  },
+});
 
-export default Store
+export default Store;

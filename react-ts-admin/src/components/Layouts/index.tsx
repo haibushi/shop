@@ -1,44 +1,36 @@
-import React from 'react';
-import { Routes, Route  } from 'react-router-dom';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import { Layout, Menu, Breadcrumb } from "antd";
 
-import Silde from './Silde';
-import routeItems, {RouteItemType} from '../../routes/routeItems'
+import Silde from "./Silde";
+import routeItems, { RouteItemType } from "../../routes/routeItems";
 
 const { Header, Content } = Layout;
 
-
-
-
-
 const Layouts = () => {
-    const renderRoutea = (()=>{
-      const routes:Array<React.ReactNode> = [];
-      const routeMap = ((arr:RouteItemType[])=>{
-        arr.forEach(route=>{
-            routes.push(
-                <Route 
-                path={route.path}
-                key={route.path}
-                element={route.component}
-                />
-            )
-            if (route.children && route.children.length) routeMap(route.children)
-        })
-      })
-      routeMap(routeItems);
+  const renderRoutea = () => {
+    const routes: Array<React.ReactNode> = [];
+    const routeMap = (arr: RouteItemType[]) => {
+      arr.forEach((route) => {
+        routes.push(
+          <Route path={route.path} key={route.path} element={route.component} />
+        );
+        if (route.children && route.children.length) routeMap(route.children);
+      });
+    };
+    routeMap(routeItems);
 
-      return routes
-    })
-    return (<Layout>
+    return routes;
+  };
+  return (
+    <Layout>
       <Header className="header">
         <div className="logo" />
-        
       </Header>
       <Layout>
         <Silde />
-        <Layout style={{ padding: '0 24px 24px' }}>
-          <Breadcrumb style={{ margin: '16px 0' }}>
+        <Layout style={{ padding: "0 24px 24px" }}>
+          <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>Home</Breadcrumb.Item>
             <Breadcrumb.Item>List</Breadcrumb.Item>
             <Breadcrumb.Item>App</Breadcrumb.Item>
@@ -51,16 +43,12 @@ const Layouts = () => {
               minHeight: 280,
             }}
           >
-            <Routes>
-              {renderRoutea()}
-            </Routes>
-            
+            <Routes>{renderRoutea()}</Routes>
           </Content>
         </Layout>
       </Layout>
-    </Layout>)
-
-}
-
+    </Layout>
+  );
+};
 
 export default Layouts;
