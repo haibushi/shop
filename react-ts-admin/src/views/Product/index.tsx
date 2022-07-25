@@ -15,7 +15,7 @@ const rowSelection = {
     console.log(
       `selectedRowKeys: ${selectedRowKeys}`,
       "selectedRows: ",
-      selectedRows
+      selectedRows,
     );
   },
   getCheckboxProps: (record: DataType) => ({
@@ -68,7 +68,7 @@ const Index = () => {
     },
   ];
   const [selectionType, setSelectionType] = useState<"checkbox" | "radio">(
-    "checkbox"
+    "checkbox",
   );
   const [dataSource, setDataSource] = useState<any[]>([]);
   const [dataId, setDataId] = useState<number>(0);

@@ -1,13 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { setLocalStorage, removeLocalStorage } from "../lib/LocalStorage";
+import { setLocalStorage, removeLocalStorage,getLocalStorage } from "../lib/LocalStorage";
 export interface initialStateType {
-  userInfo: {
-    [key: string]: any;
-  };
+  // userInfo: {
+  //   [key: string]: any;
+  // };
+
+  userInfo:Record<string,any>
 }
 
 const initialState: initialStateType = {
-  userInfo: {},
+  userInfo: JSON.parse(getLocalStorage('userInfo') || '{}'),
 };
 
 const userSlice = createSlice({
@@ -15,8 +17,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      debugger;
-      state.userInfo = action.payload.userInfo;
+      state.userInfo = action.payload;
       setLocalStorage("userInfo", JSON.stringify(action.payload));
     },
     removeUser: (state) => {

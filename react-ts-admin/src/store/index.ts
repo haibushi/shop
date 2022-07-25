@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userSlice from "./userSlice";
+import type {initialStateType} from './userSlice';
 
 export interface StorelistType {
-  user: any;
+  user: initialStateType;
 }
 
 const Store = configureStore({

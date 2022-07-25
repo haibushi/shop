@@ -7,7 +7,7 @@ import { setUser } from "../../store/userSlice";
 import "./index.css";
 import Style from "./index.module.css";
 import classnames from "classnames";
-console.log(Style);
+
 function Login() {
   const userInfo = useSelector((state: StorelistType) => state.user);
   const dispatch = useDispatch();
@@ -15,7 +15,7 @@ function Login() {
   const onFinish = (values: any) => {
     loginApi(values).then((res) => {
       if (res.data.code === 200) {
-        dispatch(setUser({ userInfo: res.data.data }));
+        dispatch(setUser({ ...res.data.data }));
         message.warning(res.data.message);
         setTimeout(() => {
           navigate("/home");

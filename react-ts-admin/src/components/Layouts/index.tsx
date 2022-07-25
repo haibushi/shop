@@ -1,8 +1,8 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Layout, Menu, Breadcrumb } from "antd";
-
+import { Layout, Breadcrumb } from "antd";
 import Silde from "./Silde";
+import ShopHeader from "./Header";
 import routeItems, { RouteItemType } from "../../routes/routeItems";
 
 const { Header, Content } = Layout;
@@ -13,7 +13,11 @@ const Layouts = () => {
     const routeMap = (arr: RouteItemType[]) => {
       arr.forEach((route) => {
         routes.push(
-          <Route path={route.path} key={route.path} element={route.component} />
+          <Route
+            path={route.path}
+            key={route.path}
+            element={route.component}
+          />,
         );
         if (route.children && route.children.length) routeMap(route.children);
       });
@@ -25,7 +29,7 @@ const Layouts = () => {
   return (
     <Layout>
       <Header className="header">
-        <div className="logo" />
+        <ShopHeader />
       </Header>
       <Layout>
         <Silde />

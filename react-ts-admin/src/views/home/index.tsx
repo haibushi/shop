@@ -6,12 +6,6 @@ function Home() {
   const { userInfo } = useSelector((state: any) => state.user);
   const [count, setCount] = useState(0);
 
-  useEffect(() => {
-    setTimeout(() => {
-      alert(count);
-    }, 1000);
-  }, [count]);
-
   function handleAlertClick() {}
 
   return (

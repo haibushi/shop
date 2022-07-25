@@ -1,4 +1,4 @@
-import { Modal, Form, Input, Upload, message, Button } from "antd";
+import { Modal, Form, Input, Upload, message, Button, Select } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import { addLunbo, update } from "../../api/lunbo";
@@ -6,16 +6,23 @@ import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import type { UploadChangeParam } from "antd/es/upload";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { find } from "../../api/lunbo";
+import { list } from "../../api/productCategory";
 interface PropsType {
   isModalVisible: boolean;
   handleCloseModal: () => void;
   getList?: () => void;
   id: number;
 }
+
+interface CategoryType {
+  id: number;
+  name: string;
+}
 const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
   const [form] = Form.useForm();
   let [filename, setFilename] = useState<string>("");
   let [loading, setLoading] = useState<boolean>(false);
+  let [categoryList, setCategoryList] = useState<CategoryType[]>([]);
 
   useEffect(() => {
     if (isModalVisible) {
@@ -33,6 +40,11 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     }
   }, [isModalVisible, id, form]);
 
+  useEffect(() => {
+    list().then((res) => {
+      setCategoryList(res.data.data);
+    });
+  }, []);
   const onFinish = async () => {
     const values = await form.validateFields();
     const data = Object.assign({}, values, { photo: filename });
@@ -55,7 +67,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     }
   };
   const handleChange: UploadProps["onChange"] = (
-    info: UploadChangeParam<UploadFile>
+    info: UploadChangeParam<UploadFile>,
   ) => {
     if (info.file.status !== "uploading") {
       console.log(info.file, info.fileList);
@@ -69,6 +81,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
       message.error("文件上传失败");
     }
   };
+
   const beforeUpload = (file: RcFile) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
     if (!isJpgOrPng) {
@@ -80,15 +93,20 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     }
     return isJpgOrPng && isLt2M;
   };
+
+  const handleChangeCategory = (value: string) => {
+    console.log(`selected ${value}`);
+  };
   const uploadButton = (
     <div>
       {loading ? <LoadingOutlined /> : <PlusOutlined />}
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+  const { Option } = Select;
   return (
     <Modal
-      title="添加轮播图"
+      title="添加商品"
       visible={isModalVisible}
       onOk={onFinish}
       onCancel={handleCloseModal}
@@ -97,14 +115,28 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     >
       <Form
         name="basic"
-        labelCol={{ span: 4 }}
+        labelCol={{ span: 6 }}
         wrapperCol={{ span: 16 }}
         initialValues={{ remember: true }}
         form={form}
         autoComplete="off"
       >
         <Form.Item
-          label="轮播图"
+          label="商品名称"
+          name="product_name"
+          rules={[{ required: true, message: "请输入商品名称!" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="商品价格"
+          name="product_priced"
+          rules={[{ required: true, message: "请输入商品价格!" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          label="商品图片"
           name="photo"
           rules={[{ required: true, message: "请上传图片" }]}
         >
@@ -125,20 +157,25 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
           </Upload>
         </Form.Item>
         <Form.Item
-          label="跳转链接"
-          name="link"
-          rules={[{ required: true, message: "请输入跳转链接!" }]}
+          label="商品分类"
+          name="product_category"
+          rules={[{ required: true, message: "请选择商品分类!" }]}
         >
+          <Select onChange={handleChangeCategory}>
+            <Option value="jack">Jack</Option>
+            <Option value="lucy">Lucy</Option>
+            <Option value="disabled" disabled>
+              Disabled
+            </Option>
+            <Option value="Yiminghe">yiminghe</Option>
+          </Select>
+        </Form.Item>
+        <Form.Item label="排序" name="sort">
           <Input />
         </Form.Item>
-        <Form.Item
-          label="排序"
-          name="sort"
-          rules={[{ required: true, message: "请输入排序!" }]}
-        >
+        <Form.Item label="是否推荐到首页" name="sort">
           <Input />
         </Form.Item>
-        `
       </Form>
     </Modal>
   );
