@@ -60,13 +60,6 @@ const routeItems: Array<RouteItemType> = [
         path: "/product/category",
         label: "商品分类",
         component: <ProductCategory />,
-        children: [
-          {
-            path: "/product/category1",
-            label: "商品分类1",
-            component: <ProductCategory />,
-          },
-        ],
       },
       {
         path: "/product/list",

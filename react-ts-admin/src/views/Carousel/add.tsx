@@ -6,6 +6,8 @@ import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import type { UploadChangeParam } from "antd/es/upload";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { find } from "../../api/lunbo";
+
+import UploadCus from "../../components/upload";
 interface PropsType {
   isModalVisible: boolean;
   handleCloseModal: () => void;
@@ -35,6 +37,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
 
   const onFinish = async () => {
     const values = await form.validateFields();
+    console.log(values);
     const data = Object.assign({}, values, { photo: filename });
     if (id) {
       update(id, data).then((res) => {
@@ -55,7 +58,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     }
   };
   const handleChange: UploadProps["onChange"] = (
-    info: UploadChangeParam<UploadFile>
+    info: UploadChangeParam<UploadFile>,
   ) => {
     if (info.file.status !== "uploading") {
       console.log(info.file, info.fileList);
@@ -68,6 +71,11 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     } else if (info.file.status === "error") {
       message.error("文件上传失败");
     }
+  };
+
+  const setCallback = (filename: string) => {
+    setFilename(filename);
+    form.setFieldsValue({ photo: filename });
   };
   const beforeUpload = (file: RcFile) => {
     const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
@@ -108,21 +116,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
           name="photo"
           rules={[{ required: true, message: "请上传图片" }]}
         >
-          <Upload
-            name="file"
-            action="http://localhost:8080/tp5/public/api/index/uploadFile"
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={false}
-            beforeUpload={beforeUpload}
-            onChange={handleChange}
-          >
-            {filename ? (
-              <img src={filename} alt="avatar" style={{ width: "100%" }} />
-            ) : (
-              uploadButton
-            )}
-          </Upload>
+          <UploadCus filename={filename} setCallback={setCallback} />
         </Form.Item>
         <Form.Item
           label="跳转链接"

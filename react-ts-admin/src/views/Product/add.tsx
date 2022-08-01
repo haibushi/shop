@@ -1,5 +1,4 @@
-import { Modal, Form, Input, Upload, message, Button, Select } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import { Modal, Form, Input, message, Button, Select } from "antd";
 import { useState, useEffect } from "react";
 import { addLunbo, update } from "../../api/lunbo";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
@@ -7,6 +6,8 @@ import type { UploadChangeParam } from "antd/es/upload";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { find } from "../../api/lunbo";
 import { list } from "../../api/productCategory";
+import BraftTextarea from "../../components/braftTextarea";
+import Upload from "../../components/upload";
 interface PropsType {
   isModalVisible: boolean;
   handleCloseModal: () => void;
@@ -48,6 +49,8 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
   const onFinish = async () => {
     const values = await form.validateFields();
     const data = Object.assign({}, values, { photo: filename });
+    console.log(values);
+    debugger;
     if (id) {
       update(id, data).then((res) => {
         message.success(res.data.message);
@@ -66,56 +69,33 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
       });
     }
   };
-  const handleChange: UploadProps["onChange"] = (
-    info: UploadChangeParam<UploadFile>,
-  ) => {
-    if (info.file.status !== "uploading") {
-      console.log(info.file, info.fileList);
-      setLoading(true);
-    }
-    if (info.file.status === "done") {
-      setLoading(false);
-      setFilename(info.file.response.data);
-      message.success("文件上传成功！");
-    } else if (info.file.status === "error") {
-      message.error("文件上传失败");
-    }
+
+  const setCallback = (filename: string) => {
+    setFilename(filename);
+    form.setFieldsValue({ photo: filename });
   };
 
-  const beforeUpload = (file: RcFile) => {
-    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-    if (!isJpgOrPng) {
-      message.error("You can only upload JPG/PNG file!");
-    }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error("Image must smaller than 2MB!");
-    }
-    return isJpgOrPng && isLt2M;
-  };
-
-  const handleChangeCategory = (value: string) => {
+  const handleChangeCategory = (value: number) => {
     console.log(`selected ${value}`);
   };
-  const uploadButton = (
-    <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
+
+  const getTextAreaVal = (val: string) => {
+    form.setFieldsValue({ product_desc: val });
+  };
   const { Option } = Select;
   return (
     <Modal
       title="添加商品"
       visible={isModalVisible}
       onOk={onFinish}
+      width="800px"
       onCancel={handleCloseModal}
       cancelText="取消"
       okText="确认"
     >
       <Form
         name="basic"
-        labelCol={{ span: 6 }}
+        labelCol={{ span: 4 }}
         wrapperCol={{ span: 16 }}
         initialValues={{ remember: true }}
         form={form}
@@ -140,21 +120,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
           name="photo"
           rules={[{ required: true, message: "请上传图片" }]}
         >
-          <Upload
-            name="file"
-            action="http://localhost:8080/tp5/public/api/index/uploadFile"
-            listType="picture-card"
-            className="avatar-uploader"
-            showUploadList={false}
-            beforeUpload={beforeUpload}
-            onChange={handleChange}
-          >
-            {filename ? (
-              <img src={filename} alt="avatar" style={{ width: "100%" }} />
-            ) : (
-              uploadButton
-            )}
-          </Upload>
+          <Upload filename={filename} setCallback={setCallback} />
         </Form.Item>
         <Form.Item
           label="商品分类"
@@ -162,19 +128,25 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
           rules={[{ required: true, message: "请选择商品分类!" }]}
         >
           <Select onChange={handleChangeCategory}>
-            <Option value="jack">Jack</Option>
-            <Option value="lucy">Lucy</Option>
-            <Option value="disabled" disabled>
-              Disabled
-            </Option>
-            <Option value="Yiminghe">yiminghe</Option>
+            {categoryList.length > 0 &&
+              categoryList.map((list) => {
+                return (
+                  <Option value={list.id} key={list.id}>
+                    {list.name}
+                  </Option>
+                );
+              })}
           </Select>
         </Form.Item>
+
         <Form.Item label="排序" name="sort">
           <Input />
         </Form.Item>
-        <Form.Item label="是否推荐到首页" name="sort">
+        <Form.Item label="是否推荐到首页" name="is_tuijian">
           <Input />
+        </Form.Item>
+        <Form.Item label="商品描述" name="product_desc">
+          <BraftTextarea getTextAreaVal={getTextAreaVal} />
         </Form.Item>
       </Form>
     </Modal>
