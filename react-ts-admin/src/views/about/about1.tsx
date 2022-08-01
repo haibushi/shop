@@ -1,5 +1,5 @@
 import About2 from "./about2";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 interface propsType {
   num: number;
 }
@@ -7,6 +7,7 @@ function About1(props: propsType) {
   const info = {
     num: props.num,
   };
+  const about2 = useMemo(() => <About2 />, []);
   const [numInfo, setNumInfo] = useState(info);
 
   console.log("About1", numInfo.num);
@@ -19,9 +20,10 @@ function About1(props: propsType) {
   };
   return (
     <div>
-      {numInfo.num}
-      <button onClick={handle}>{numInfo.num}</button>
-      <About2></About2>
+      <button onClick={handle}>
+        {numInfo.num}|{props.num}
+      </button>
+      {about2}
     </div>
   );
 }

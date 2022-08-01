@@ -1,10 +1,9 @@
 import { Modal, Form, Input, message, Button, Select } from "antd";
 import { useState, useEffect } from "react";
-import { addLunbo, update } from "../../api/lunbo";
+import { addProduct, update, find } from "../../api/product";
 import type { RcFile, UploadFile, UploadProps } from "antd/es/upload/interface";
 import type { UploadChangeParam } from "antd/es/upload";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-import { find } from "../../api/lunbo";
 import { list } from "../../api/productCategory";
 import BraftTextarea from "../../components/braftTextarea";
 import Upload from "../../components/upload";
@@ -33,9 +32,9 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
     if (id) {
       find({ id }).then((res) => {
         if (res.data.code === 200) {
-          setFilename(res.data.data?.photo || "");
-          let { link, sort, photo } = res.data.data;
-          form.setFieldsValue({ link, sort, photo });
+          setFilename(res.data.data?.product_url || "");
+          let { link, sort, product_url } = res.data.data;
+          form.setFieldsValue({ link, sort, product_url });
         }
       });
     }
@@ -48,7 +47,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
   }, []);
   const onFinish = async () => {
     const values = await form.validateFields();
-    const data = Object.assign({}, values, { photo: filename });
+    const data = Object.assign({}, values, { product_url: filename });
     console.log(values);
     debugger;
     if (id) {
@@ -60,7 +59,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
         }
       });
     } else {
-      addLunbo(data).then((res) => {
+      addProduct(data).then((res) => {
         message.success(res.data.message);
         if (res.data.code === 200) {
           handleCloseModal();
@@ -72,7 +71,7 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
 
   const setCallback = (filename: string) => {
     setFilename(filename);
-    form.setFieldsValue({ photo: filename });
+    form.setFieldsValue({ product_url: filename });
   };
 
   const handleChangeCategory = (value: number) => {
@@ -110,21 +109,21 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
         </Form.Item>
         <Form.Item
           label="商品价格"
-          name="product_priced"
+          name="product_price"
           rules={[{ required: true, message: "请输入商品价格!" }]}
         >
           <Input />
         </Form.Item>
         <Form.Item
           label="商品图片"
-          name="photo"
+          name="product_url"
           rules={[{ required: true, message: "请上传图片" }]}
         >
           <Upload filename={filename} setCallback={setCallback} />
         </Form.Item>
         <Form.Item
           label="商品分类"
-          name="product_category"
+          name="category_id"
           rules={[{ required: true, message: "请选择商品分类!" }]}
         >
           <Select onChange={handleChangeCategory}>
@@ -140,6 +139,9 @@ const Add = ({ isModalVisible, handleCloseModal, getList, id }: PropsType) => {
         </Form.Item>
 
         <Form.Item label="排序" name="sort">
+          <Input />
+        </Form.Item>
+        <Form.Item label="排序" name="is_top">
           <Input />
         </Form.Item>
         <Form.Item label="是否推荐到首页" name="is_tuijian">

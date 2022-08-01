@@ -1,7 +1,8 @@
 import { Space, Button, Table, Modal, Popconfirm, message } from "antd";
 import { useState, useEffect } from "react";
 import Add from "./add";
-import { listLunbo, deleteLunbo, deleteAll } from "../../api/lunbo";
+import { listProduct, deleteProduct } from "../../api/product";
+import type { Service } from "../../api/type";
 interface DataType {
   key: React.Key;
   id: number;
@@ -23,30 +24,31 @@ const rowSelection = {
     name: record.name,
   }),
 };
+
 const Index = () => {
   const columns = [
     {
-      title: "图片",
-      dataIndex: "photo",
-      key: "photo",
+      title: "产品名称",
+      dataIndex: "product_name",
+      key: "product_name",
+    },
+    {
+      title: "产品图片",
+      dataIndex: "product_url",
+      key: "product_url",
       render(text: string) {
         return <img src={text} height="100" />;
       },
     },
     {
-      title: "链接",
-      dataIndex: "link",
-      key: "link",
+      title: "产品价格",
+      dataIndex: "product_price",
+      key: "product_price",
     },
     {
-      title: "排序",
-      dataIndex: "sort",
-      key: "sort",
-    },
-    {
-      title: "创建时间",
-      dataIndex: "create_time",
-      key: "create_time",
+      title: "产品分类",
+      dataIndex: "category_id",
+      key: "category_id",
     },
     {
       title: "操作",
@@ -80,9 +82,9 @@ const Index = () => {
     setIsModalVisible(true);
   };
   const handleDelete = (id: number) => {
-    deleteLunbo({ id }).then((res) => {
+    deleteProduct({ id }).then((res: any) => {
       if (res.data.code === 200) {
-        message.success("操作成功");
+        message.success("操作成 功");
         getList();
       } else {
         message.success("操作失败");
@@ -91,7 +93,7 @@ const Index = () => {
   };
 
   const getList = () => {
-    listLunbo().then((res) => {
+    listProduct().then((res) => {
       const data = res.data.data.map((item: any) => {
         return {
           ...item,
@@ -112,30 +114,13 @@ const Index = () => {
   const handleCloseModal = () => {
     setIsModalVisible(false);
   };
-  const handleDeleteAll = () => {
-    if (selectAllIds.length == 0) {
-      message.warning("请选择要操作的数据");
-      return false;
-    }
-    deleteAll({ ids: selectAllIds.join(",") }).then((res) => {
-      if (res.data.code === 200) {
-        message.success("操作成功");
-        getList();
-      } else {
-        message.success("操作失败");
-      }
-    });
-  };
 
   return (
     <div>
-      <h4>轮播图管理</h4>
+      <h4>产品管理</h4>
       <Space style={{ width: "100%" }}>
         <Button type="primary" onClick={handleOpenModal}>
           新增
-        </Button>
-        <Button danger onClick={handleDeleteAll}>
-          删除
         </Button>
       </Space>
       <Table

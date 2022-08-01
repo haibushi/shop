@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="./down.js"></script>
+</head>
+<style>
+  .box {
+    display: flex;
+    justify-content: center;
+  }
+
+  input {
+    width: 200px;
+    height: 40px;
+    margin-right: 20px;
+  }
+
+  button {
+    width: 80px;
+    cursor: pointer;
+  }
+</style>
+
+<body>
+  <div class="box">
+    <input type="text">
+    <button>下载</button>
+  </div>
+</body>
+<script>
+  const inp = document.querySelector('input')
+  const btn = document.querySelector('button')
+  const fields = ['Workstream','Owner','Scrum Master','Ticket ID','Repo','Commit ID','Change Scope','QA','Ticket Status','Stg Test Result','APS/TST/UAT Test Result','Comment','Deployment Status']
+  const submit = () => {
+    const value = inp.value;
+    
+    // const tickets = value.split(',');
+
+    const tickets = value.split(',').filter(res=>{
+      
+      if(res && res.trim()){
+        return res.trim();
+      }
+    });
+
+    let bool = false;
+    tickets.forEach(res=>{
+      console.log(res);
+      if(!/^[a-zA-Z]{3,4}-[0-9]{4,5}$/.test(res)){
+        alert('ticket不符合');
+        bool = true;
+      }
+    })
+
+    if(bool){
+      return false;
+    }
+    
+    Promise.all(tickets.map(item => {
+      return axios.get(`https://michaels.atlassian.net/rest/api/2/issue/${item}`)
+        .then(async (res) => {
+          const releasePr = res.data.fields.customfield_10062;
+          const urlArr = releasePr.split('/')
+          const repository = urlArr[4]
+          const prId = urlArr[6]
+          let str = ''
+		  const obj = {
+			'Ticket ID':item,
+			'Repo':repository,
+			'Change Scope':res.data.fields.summary.replace(/, /g,'--'),
+			'Ticket Status':res.data.fields.status.name,
+      'QA':res.data.fields.reporter.displayName || res.data.fields.creator.displayName
+		  }
+          await axios
+            .get(`https://bitbucket.org/!api/2.0/repositories/miktechnology/${repository}/pullrequests/${prId}/commits?truncate_to=256`)
+            .then((resp) => {
+              const { hash } = resp.data.values[0]
+              const commitId = hash.substr(0, 7)
+              str = item + ',' + commitId
+			  obj['Commit ID'] = commitId;
+            })
+          return obj
+        })
+    })).then((res) => {
+      fields.forEach(field=>{
+      res.forEach(item=>{
+        item[field] =  item[field] || ''
+      })
+      })
+      getBibucketCommitData(fields,res);
+      
+    }).catch(err=>{
+      console.log('err',err.config.url);
+      let url_arr = err.config.url.split('/');
+      let ticketId = url_arr[url_arr.length-1];
+      alert(ticketId+' Error');
+    })
+  }
+
+  inp.addEventListener('keydown', (event) => {
+    const e = window.event || event
+    if (e.keyCode === 13) {
+      submit()
+    }
+  })
+  btn.addEventListener('click', submit)
+  
+  
+  
+</script>
+
+</html>
